@@ -34,6 +34,7 @@ import ChatAlert from './ChatAlert';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import ProgressCompilation from './ProgressCompilation';
 import type { ProgressAnnotation } from '~/types/context';
+import { LOCAL_PROVIDERS } from '~/lib/stores/settings';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -303,57 +304,58 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         data-chat-visible={showChat}
       >
         <ClientOnly>{() => <Menu />}</ClientOnly>
-        <div ref={scrollRef} className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
+        <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
           <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
             {!chatStarted && (
-              <div className="max-w-2xl mx-auto text-left">
-                <blockquote className="text-sm lg:text-base italic text-gray-300 border-l-4 border-gray-500 pl-4 py-2 mb-2">
-                  A computational process is indeed much like a sorcerer's idea of a spirit. It cannot be seen or touched. It is not composed of matter at all. However, it is very real. It can perform intellectual work. It can answer questions. It can aﬀect the world by disbursing money at a bank or by controlling a robot arm in a factory. The programs we use to conjure processes are like a sorcerer's spells. They are carefully composed from symbolic expressions in arcane and esoteric programming languages that prescribe the tasks we want our processes to perform.
-                </blockquote>
-                <div className="text-xs lg:text-sm text-gray-400 text-right">
-                  ~H. Abelson, G. Sussman - Structure and Interpretation of Computer Programs
-                </div>
+              <div id="intro" className="mt-[16vh] max-w-chat mx-auto text-center px-4 lg:px-0">
+                <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
+                  Where ideas begin
+                </h1>
+                <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
+                  Bring ideas to life in seconds or get help on existing projects.
+                </p>
               </div>
             )}
             <div
               className={classNames('pt-6 px-2 sm:px-6', {
-                'h-full flex flex-col': chatStarted,
+                'h-full flex flex-col pb-4 overflow-y-auto': chatStarted,
               })}
               ref={scrollRef}
             >
               <ClientOnly>
                 {() => {
                   return chatStarted ? (
-                    <Messages
-                      ref={messageRef}
-                      className="flex flex-col w-full flex-1 max-w-chat pb-6 mx-auto z-1"
-                      messages={messages}
-                      isStreaming={isStreaming}
-                    />
+                    <div className="flex-1 w-full max-w-chat pb-6 mx-auto z-1">
+                      <Messages
+                        ref={messageRef}
+                        className="flex flex-col "
+                        messages={messages}
+                        isStreaming={isStreaming}
+                      />
+                    </div>
                   ) : null;
                 }}
               </ClientOnly>
               <div
-                className={classNames('flex flex-col gap-4 w-full max-w-chat mx-auto z-prompt mb-6', {
+                className={classNames('flex flex-col gap-4 w-full max-w-chat mx-auto z-prompt', {
                   'sticky bottom-2': chatStarted,
+                  'position-absolute': chatStarted,
                 })}
               >
-                <div className="bg-bolt-elements-background-depth-2">
-                  {actionAlert && (
-                    <ChatAlert
-                      alert={actionAlert}
-                      clearAlert={() => clearAlert?.()}
-                      postMessage={(message) => {
-                        sendMessage?.({} as any, message);
-                        clearAlert?.();
-                      }}
-                    />
-                  )}
-                </div>
+                {actionAlert && (
+                  <ChatAlert
+                    alert={actionAlert}
+                    clearAlert={() => clearAlert?.()}
+                    postMessage={(message) => {
+                      sendMessage?.({} as any, message);
+                      clearAlert?.();
+                    }}
+                  />
+                )}
                 {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
                 <div
                   className={classNames(
-                    'bg-bolt-elements-background-depth-2 p-3 relative w-full max-w-chat mx-auto z-prompt',
+                    'bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor relative w-full max-w-chat mx-auto z-prompt',
 
                     /*
                      * {
@@ -362,42 +364,48 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                      */
                   )}
                 >
+                  <svg className={classNames(styles.PromptEffectContainer)}>
+                    <defs>
+                      <linearGradient
+                        id="line-gradient"
+                        x1="20%"
+                        y1="0%"
+                        x2="-14%"
+                        y2="10%"
+                        gradientUnits="userSpaceOnUse"
+                        gradientTransform="rotate(-45)"
+                      >
+                        <stop offset="0%" stopColor="#b44aff" stopOpacity="0%"></stop>
+                        <stop offset="40%" stopColor="#b44aff" stopOpacity="80%"></stop>
+                        <stop offset="50%" stopColor="#b44aff" stopOpacity="80%"></stop>
+                        <stop offset="100%" stopColor="#b44aff" stopOpacity="0%"></stop>
+                      </linearGradient>
+                      <linearGradient id="shine-gradient">
+                        <stop offset="0%" stopColor="white" stopOpacity="0%"></stop>
+                        <stop offset="40%" stopColor="#ffffff" stopOpacity="80%"></stop>
+                        <stop offset="50%" stopColor="#ffffff" stopOpacity="80%"></stop>
+                        <stop offset="100%" stopColor="white" stopOpacity="0%"></stop>
+                      </linearGradient>
+                    </defs>
+                    <rect className={classNames(styles.PromptEffectLine)} pathLength="100" strokeLinecap="round"></rect>
+                    <rect className={classNames(styles.PromptShine)} x="48" y="24" width="70" height="1"></rect>
+                  </svg>
                   <div>
                     <ClientOnly>
                       {() => (
                         <div className={isModelSettingsCollapsed ? 'hidden' : ''}>
-                          <div className="mb-2 flex gap-2 flex-col sm:flex-row">
-                            <select
-                              value={provider?.name}
-                              onChange={(e) => {
-                                const selectedProvider = providerList?.find((p) => p.name === e.target.value);
-                                if (selectedProvider) {
-                                  setProvider?.(selectedProvider);
-                                }
-                              }}
-                              className="flex-1 p-2 rounded-lg border border-[#4a4a4a] bg-[#2a2a2a] hover:bg-[#3a3a3a] text-[#74ecf8] focus:border-[#74ecf8] transition-all text-sm min-w-[100px] outline-none"
-                            >
-                              {providerList?.map((p) => (
-                                <option key={p.name} value={p.name} className="bg-[#2a2a2a]">
-                                  {p.name}
-                                </option>
-                              ))}
-                            </select>
-                            <select
-                              value={model}
-                              onChange={(e) => setModel?.(e.target.value)}
-                              className="flex-1 p-2 rounded-lg border border-[#4a4a4a] bg-[#2a2a2a] hover:bg-[#3a3a3a] text-[#f874ec] focus:border-[#f874ec] transition-all text-sm min-w-[100px] outline-none"
-                            >
-                              {modelList
-                                .filter((m) => m.provider === provider?.name)
-                                .map((m) => (
-                                  <option key={m.name} value={m.name} className="bg-[#2a2a2a]">
-                                    {m.name}
-                                  </option>
-                                ))}
-                            </select>
-                          </div>
-                          {/* {(providerList || []).length > 0 && provider && (
+                          <ModelSelector
+                            key={provider?.name + ':' + modelList.length}
+                            model={model}
+                            setModel={setModel}
+                            modelList={modelList}
+                            provider={provider}
+                            setProvider={setProvider}
+                            providerList={providerList || (PROVIDER_LIST as ProviderInfo[])}
+                            apiKeys={apiKeys}
+                            modelLoading={isModelLoading}
+                          />
+                          {(providerList || []).length > 0 && provider && !LOCAL_PROVIDERS.includes(provider.name) && (
                             <APIKeyManager
                               provider={provider}
                               apiKey={apiKeys[provider.name] || ''}
@@ -405,7 +413,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                                 onApiKeysChange(provider.name, key);
                               }}
                             />
-                          )} */}
+                          )}
                         </div>
                       )}
                     </ClientOnly>
@@ -435,8 +443,11 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                   >
                     <textarea
                       ref={textareaRef}
-                      className="w-full resize-none bg-transparent outline-none text-white placeholder:text-gray-400 p-4"
-                      rows={1}
+                      className={classNames(
+                        'w-full pl-4 pt-4 pr-16 outline-none resize-none text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary bg-transparent text-sm',
+                        'transition-all duration-200',
+                        'hover:border-bolt-elements-focus',
+                      )}
                       onDragEnter={(e) => {
                         e.preventDefault();
                         e.currentTarget.style.border = '2px solid #1488fc';
@@ -497,7 +508,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         minHeight: TEXTAREA_MIN_HEIGHT,
                         maxHeight: TEXTAREA_MAX_HEIGHT,
                       }}
-                      placeholder="How can Polli help you today?"
+                      placeholder="How can Bolt help you today?"
                       translate="no"
                     />
                     <ClientOnly>
@@ -574,15 +585,16 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 </div>
               </div>
             </div>
-            <div className="flex flex-col justify-center gap-5">
-              {!chatStarted && (
+            {!chatStarted && (
+              <div className="flex flex-col justify-center mt-6 gap-5">
                 <div className="flex justify-center gap-2">
-                  {ImportButtons(importChat)}
-                  <GitCloneButton importChat={importChat} />
+                  <div className="flex items-center gap-2">
+                    {ImportButtons(importChat)}
+                    <GitCloneButton importChat={importChat} className="min-w-[120px]" />
+                  </div>
                 </div>
-              )}
-              {!chatStarted &&
-                ExamplePrompts((event, messageInput) => {
+
+                {ExamplePrompts((event, messageInput) => {
                   if (isStreaming) {
                     handleStop?.();
                     return;
@@ -590,8 +602,9 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
 
                   handleSendMessage?.(event, messageInput);
                 })}
-              {!chatStarted && <StarterTemplates />}
-            </div>
+                <StarterTemplates />
+              </div>
+            )}
           </div>
           <ClientOnly>{() => <Workbench chatStarted={chatStarted} isStreaming={isStreaming} />}</ClientOnly>
         </div>
