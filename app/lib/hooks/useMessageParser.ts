@@ -55,7 +55,7 @@ export function useMessageParser() {
     logger.debug('Parsing messages:', { 
       messagesCount: messages.length,
       isLoading,
-      currentParsedCount: Object.keys(parsedMessages).length 
+      currentParsedCount: Object.keys(parsedMessages).length
     });
 
     if (import.meta.env.DEV && !isLoading) {
