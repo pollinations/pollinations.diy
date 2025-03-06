@@ -42,7 +42,6 @@ export default function ProgressCompilation({ data }: { data?: ProgressAnnotatio
           'shadow-lg rounded-lg  relative w-full max-w-chat mx-auto z-prompt',
           'p-1',
         )}
-        style={{ transform: 'translateY(1rem)' }}
       >
         <div
           className={classNames(

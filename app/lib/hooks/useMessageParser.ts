@@ -42,6 +42,10 @@ const messageParser = new StreamingMessageParser({
     },
   },
 });
+const extractTextContent = (message: Message) =>
+  Array.isArray(message.content)
+    ? (message.content.find((item) => item.type === 'text')?.text as string) || ''
+    : message.content;
 
 export function useMessageParser() {
   const [parsedMessages, setParsedMessages] = useState<{ [key: number]: string }>({});
@@ -60,9 +64,8 @@ export function useMessageParser() {
     }
 
     for (const [index, message] of messages.entries()) {
-      if (message.role === 'assistant') {
-        const newParsedContent = messageParser.parse(message.id, message.content);
-
+      if (message.role === 'assistant' || message.role === 'user') {
+        const newParsedContent = messageParser.parse(message.id, extractTextContent(message));
         setParsedMessages((prevParsed) => ({
           ...prevParsed,
           [index]: !reset ? (prevParsed[index] || '') + newParsedContent : newParsedContent,

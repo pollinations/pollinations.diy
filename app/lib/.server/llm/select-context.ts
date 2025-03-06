@@ -204,7 +204,10 @@ export async function selectContext(props: {
     }
 
     if (!filePaths.includes(fullPath)) {
-      throw new Error(`File ${path} is not in the list of files above.`);
+      logger.error(`File ${path} is not in the list of files above.`);
+      return;
+
+      // throw new Error(`File ${path} is not in the list of files above.`);
     }
 
     if (currrentFiles.includes(path)) {
@@ -216,6 +219,13 @@ export async function selectContext(props: {
 
   if (onFinish) {
     onFinish(resp);
+  }
+
+  const totalFiles = Object.keys(filteredFiles).length;
+  logger.info(`Total files: ${totalFiles}`);
+
+  if (totalFiles == 0) {
+    throw new Error(`Bolt failed to select files`);
   }
 
   return filteredFiles;

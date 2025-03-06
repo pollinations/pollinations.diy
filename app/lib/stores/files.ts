@@ -75,6 +75,29 @@ export class FilesStore {
   getFileModifications() {
     return computeFileModifications(this.files.get(), this.#modifiedFiles);
   }
+  getModifiedFiles() {
+    let modifiedFiles: { [path: string]: File } | undefined = undefined;
+
+    for (const [filePath, originalContent] of this.#modifiedFiles) {
+      const file = this.files.get()[filePath];
+
+      if (file?.type !== 'file') {
+        continue;
+      }
+
+      if (file.content === originalContent) {
+        continue;
+      }
+
+      if (!modifiedFiles) {
+        modifiedFiles = {};
+      }
+
+      modifiedFiles[filePath] = file;
+    }
+
+    return modifiedFiles;
+  }
 
   resetFileModifications() {
     this.#modifiedFiles.clear();
@@ -92,7 +115,7 @@ export class FilesStore {
 
       const oldContent = this.getFile(filePath)?.content;
 
-      if (!oldContent) {
+      if (!oldContent && oldContent !== '') {
         unreachable('Expected content to be defined');
       }
 
