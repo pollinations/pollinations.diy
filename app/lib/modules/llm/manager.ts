@@ -86,6 +86,7 @@ export class LLMManager {
       enabledProviders = enabledProviders.filter((p) => providerSettings[p].enabled);
     }
 
+    console.log('updateModelList enabledProviders', enabledProviders);
     // Get dynamic models from all providers that support them
     const dynamicModels = await Promise.all(
       Array.from(this._providers.values())
@@ -95,11 +96,13 @@ export class LLMManager {
             !!provider.getDynamicModels,
         )
         .map(async (provider) => {
-          const cachedModels = provider.getModelsFromCache(options);
+          // const cachedModels = provider.getModelsFromCache(options);
 
-          if (cachedModels) {
-            return cachedModels;
-          }
+          // if (cachedModels) {
+          //   return cachedModels;
+          // }
+
+          console.log("provider", provider);
 
           const dynamicModels = await provider
             .getDynamicModels(apiKeys, providerSettings?.[provider.name], serverEnv)

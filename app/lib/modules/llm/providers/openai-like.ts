@@ -27,6 +27,8 @@ export default class OpenAILikeProvider extends BaseProvider {
       defaultApiTokenKey: 'OPENAI_LIKE_API_KEY',
     });
 
+    console.log('OpenAILikeProvider getDynamicModels', { baseUrl, apiKey });
+
     if (!baseUrl || !apiKey) {
       return [];
     }
