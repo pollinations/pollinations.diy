@@ -3,8 +3,12 @@ import { RemixServer } from '@remix-run/react';
 import { isbot } from 'isbot';
 import { renderToReadableStream } from 'react-dom/server';
 import { renderHeadToString } from 'remix-island';
+import { applyFetchPolyfill } from './lib/cloudflare-fetch-polyfill';
 import { Head } from './root';
 import { themeStore } from '~/lib/stores/theme';
+
+// Apply fetch polyfill for Cloudflare Workers environment
+applyFetchPolyfill();
 
 export default async function handleRequest(
   request: Request,

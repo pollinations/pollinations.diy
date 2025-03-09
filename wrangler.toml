@@ -4,3 +4,7 @@ compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2025-02-05"
 pages_build_output_dir = "./build/client"
 send_metrics = false
+
+[vars]
+OPENAI_LIKE_API_KEY = "dummy"
+OPENAI_LIKE_API_BASE_URL = "https://text.pollinations.ai/openai"
