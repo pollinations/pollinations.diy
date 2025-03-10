@@ -2,6 +2,13 @@ import { BaseProvider, getOpenAILikeModel } from '~/lib/modules/llm/base-provide
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
 import type { LanguageModelV1 } from 'ai';
+import { createScopedLogger } from '~/utils/logger';
+
+const logger = createScopedLogger('PollinationsProvider');
+
+interface OpenAILikeResponse {
+  data: Array<{ id: string }>;
+}
 
 export default class OpenAILikeProvider extends BaseProvider {
   name = 'Pollinations.AI';
@@ -27,24 +34,54 @@ export default class OpenAILikeProvider extends BaseProvider {
       defaultApiTokenKey: 'OPENAI_LIKE_API_KEY',
     });
 
+    logger.info(`Fetching models for Pollinations.AI with baseUrl: ${baseUrl}`);
+
     if (!baseUrl || !apiKey) {
+      logger.error('Missing baseUrl or apiKey for Pollinations.AI');
       return [];
     }
 
-    const response = await fetch(`${baseUrl}/models`, {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-    });
+    try {
+      logger.info(`Making request to ${baseUrl}/models`);
+      
+      // Use the full URL as specified
+      const response = await fetch(`https://text.pollinations.ai/openai/models`, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
+      });
 
-    const res = (await response.json()) as any;
+      if (!response.ok) {
+        logger.error(`Error fetching models: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        logger.error(`Error response: ${errorText}`);
+        return [];
+      }
 
-    return res.data.map((model: any) => ({
-      name: model.id,
-      label: model.id,
-      provider: this.name,
-      maxTokenAllowed: 8000,
-    }));
+      const res = await response.json() as unknown;
+      logger.info(`Got response from https://text.pollinations.ai/openai/models: ${JSON.stringify(res, null, 2)}`);
+
+      if (!res || typeof res !== 'object' || !('data' in res) || !Array.isArray((res as any).data)) {
+        logger.error(`Invalid response format. Expected 'data' array but got: ${JSON.stringify(res)}`);
+        return [];
+      }
+
+      // Map the response data to ModelInfo objects
+      const models = (res as OpenAILikeResponse).data.map(item => ({
+        id: item.id,
+        name: item.id,
+        label: item.id,
+        provider: this.name,
+        supported: true,
+        maxTokenAllowed: 16000, // Default token limit
+      }));
+
+      logger.info(`Mapped ${models.length} models from response`);
+      return models;
+    } catch (error) {
+      logger.error(`Exception fetching models: ${error}`);
+      return [];
+    }
   }
 
   getModelInstance(options: {
