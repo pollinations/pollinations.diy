@@ -290,7 +290,7 @@ ${codeExamples}
 
     10. ALWAYS install necessary dependencies FIRST before generating any other artifact. If that requires a \`package.json\` then you should create that first!
 
-      IMPORTANT: Add all required dependencies to the \`package.json\` already and try to avoid \`npm i <pkg>\` if possible!
+      IMPORTANT: Always use \`npm install\` or \`npm install <package>@<major-version>\` to add dependencies instead of writing them directly to package.json. This ensures you get the latest versions. Never write dependencies directly to package.json.
 
     11. CRITICAL: Always provide the FULL, updated content of the artifact. This means:
 
