@@ -11,6 +11,9 @@ const apiDocs = `
   Parameters: prompt*, model, seed, width, height, nologo, private, enhance, safe
   Return: Image file
 - List Models: GET https://image.pollinations.ai/models
+  Available Models:
+  - flux: Default model for image generation
+  - turbo: Fast image generation model
 
 ## Text Generation API (Default model: 'openai')
 - Generate (GET): GET https://text.pollinations.ai/{prompt}
@@ -23,6 +26,31 @@ const apiDocs = `
   Body: Follows OpenAI ChatGPT API format
   Return: OpenAI-style response
 - List Models: GET https://text.pollinations.ai/models
+  Available Models:
+  Base Models:
+  - openai (GPT-4o-mini): OpenAI model with vision capabilities
+  - openai-large (GPT-4o): Larger OpenAI model with vision
+  - openai-reasoning (o3-mini): OpenAI model with reasoning capabilities
+  - qwen-coder: Qwen 2.5 Coder 32B for coding tasks
+  - llama: Llama 3.3 70B uncensored model
+  - mistral: Mistral Small 3.1 with vision capabilities
+  - deepseek: DeepSeek-V3 model
+  - deepseek-r1: DeepSeek-R1 Distill Qwen 32B with reasoning
+  - llamalight: Lightweight Llama 3.1 8B Instruct
+  - phi: Phi-4 Instruct model
+  - llama-vision: Llama 3.2 11B with vision capabilities
+  - pixtral: Pixtral 12B with vision
+  - gemini: Gemini 2.0 Flash
+  
+  Specialized Models:
+  - unity: Unity with Mistral Large by Unity AI Lab
+  - midijourney: Musical transformer for MIDI generation
+  - rtist: Image generator by @bqrio
+  - searchgpt: Realtime news and web search capabilities
+  - evil: Experimental uncensored mode
+  - llamaguard: Safety model using Llamaguard 7B
+  - sur: Sur AI Assistant
+  - openai-audio: Audio capabilities with multiple voices
 
 ## Feed Endpoints
 - Image Feed: GET https://image.pollinations.ai/feed (SSE stream of user-generated images).
