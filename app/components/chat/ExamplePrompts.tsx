@@ -1,11 +1,18 @@
 import React from 'react';
 
 const EXAMPLE_PROMPTS = [
-  { text: 'Build a todo app in React using Tailwind' },
-  { text: 'Build a simple blog using Astro' },
-  { text: 'Create a cookie consent form using Material UI' },
-  { text: 'Make a space invaders game' },
-  { text: 'Make a Tic Tac Toe game in html, css and js only' },
+  { text: 'Create a 3D scene with a rotating cube and bouncing balls using Three.js' },
+  { text: 'Build an AI storybook generator that creates illustrated children\'s stories' },
+  { text: 'Create a music visualizer that generates AI art based on MIDI input' },
+  { text: 'Make an AI character roleplay chat with dynamic avatar generation' },
+  { text: 'Build a CalorieAI app that analyzes food photos for nutritional content' },
+  { text: 'Create an interactive text adventure game with AI-generated scene images' },
+  { text: 'Make a "Paint with Weather" app that generates art based on local weather data' },
+  { text: 'Create a "Dream Diary" that illustrates your written dreams with AI art' },
+  { text: 'Build a "Pet Portrait Studio" that turns photos into different art styles' },
+  { text: 'Make a "Time Travel Postcard" generator with historical style images' },
+  { text: 'Create an "Emoji Story" generator that turns emojis into illustrated scenes' },
+  { text: 'Build a "Recipe Visualizer" that shows ingredients as artistic compositions' }
 ];
 
 export function ExamplePrompts(sendMessage?: { (event: React.UIEvent, messageInput?: string): void | undefined }) {
